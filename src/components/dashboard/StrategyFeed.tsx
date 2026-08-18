@@ -32,7 +32,7 @@ const INITIAL_HISTORY: FeedEvent[] = [
         id: 'init-1',
         type: 'system',
         title: 'Agent Initialized',
-        detail: 'ZenithFi Agent connected to Base Sepolia Intent Registry.',
+        detail: 'Zeinyra Agent connected to Base Sepolia Intent Registry.',
         timestamp: new Date(Date.now() - 3600000), // 1 hour ago
     },
     {

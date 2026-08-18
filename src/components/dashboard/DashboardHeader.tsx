@@ -231,14 +231,18 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({ sidebarCollapsed }) =
           <button
             onClick={() => setShowWalletMenu(!showWalletMenu)}
             aria-label="Wallet menu"
-            className="flex items-center gap-2 px-3 py-2 rounded-lg transition-all animate-pulse-neon"
+            className="flex items-center gap-2.5 px-3 py-2 rounded-lg transition-all animate-pulse-neon"
             style={{
               background: 'linear-gradient(135deg, rgba(0,212,255,0.12) 0%, rgba(0,255,163,0.08) 100%)',
               border: '1px solid rgba(0,212,255,0.25)',
             }}
           >
             <div className="w-2 h-2 rounded-full bg-[#00FFA3]" />
-            <span className="text-sm font-mono text-[#00D4FF]">
+            <span className="text-sm font-mono font-medium text-white tabular-nums">
+              {balanceDisplay}
+            </span>
+            <span className="hidden sm:inline h-3 w-px bg-white/15" aria-hidden />
+            <span className="hidden sm:inline text-sm font-mono text-[#00D4FF]">
               {shortAddress}
             </span>
             <ChevronDown size={14} className="text-gray-400" />

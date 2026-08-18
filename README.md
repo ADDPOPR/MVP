@@ -1,6 +1,6 @@
-# ZenithFi: AI-Driven Decentralized Portfolio Optimization Protocol
+# Zeinyra: AI-Driven Decentralized Portfolio Optimization Protocol
 
-**ZenithFi** is a DeFi portfolio optimization protocol that integrates artificial intelligence with non-custodial blockchain execution. Users deploy autonomous AI agents that analyze on-chain markets, identify yield opportunities, and execute optimization strategies through user-defined intents.
+**Zeinyra** is a DeFi portfolio optimization protocol that integrates artificial intelligence with non-custodial blockchain execution. Users deploy autonomous AI agents that analyze on-chain markets, identify yield opportunities, and execute optimization strategies through user-defined intents.
 
 The goal is to transform DeFi portfolio management from a manual, reactive process into an intelligent, autonomous, and continuously optimizing financial system—without sacrificing custody or transparency.
 
@@ -16,9 +16,9 @@ DeFi offers open market access, but effective portfolio management remains compl
 
 ## Solution
 
-ZenithFi adds an AI-driven abstraction layer that automates decision-making while preserving full user custody.
+Zeinyra adds an AI-driven abstraction layer that automates decision-making while preserving full user custody.
 
-Each user deploys a **ZenithFi AI Agent** that:
+Each user deploys a **Zeinyra AI Agent** that:
 
 - Continuously scans DeFi protocols
 - Analyzes yield opportunities and risk metrics

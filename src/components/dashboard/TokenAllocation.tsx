@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Sector } from 'recharts';
-import { useTokenBalances } from '@/hooks/useTokenBalances';
-import { useWallet } from '@/contexts/WalletContext';
+import { useOnChainBalances } from '@/hooks/useOnChainBalances';
 import { PieChart as PieIcon, Loader2 } from 'lucide-react';
 
 interface ActiveShapeProps {
@@ -54,8 +53,12 @@ const renderActiveShape = (props: ActiveShapeProps) => {
 
 const TokenAllocation: React.FC = () => {
   const [activeIndex, setActiveIndex] = useState(0);
-  const { smartAccountAddress } = useWallet();
-  const { tokens, isLoading, totalUsd } = useTokenBalances(smartAccountAddress);
+  const { assets, isLoading } = useOnChainBalances();
+  const totalUsd = useMemo(
+    () => assets.reduce((sum, a) => sum + a.usdValue, 0),
+    [assets],
+  );
+  const tokens = assets;
 
   // Build pie data from live token balances
   const pieData = tokens

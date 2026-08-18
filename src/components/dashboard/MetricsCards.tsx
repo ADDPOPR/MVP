@@ -8,8 +8,6 @@
  */
 
 import React, { useState, useEffect, useRef } from 'react';
-import { useBalance } from 'wagmi';
-import { formatEther } from 'viem';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   DollarSign,
@@ -28,38 +26,26 @@ import { useEnvironment } from '@/contexts/EnvironmentContext';
 import { useAgentData } from '@/hooks/useAgentData';
 import { useAgentStrategies } from '@/hooks/useAgentStrategies';
 import { usePriceData } from '@/hooks/usePriceData';
-import { useUniswapV3Position } from '@/hooks/useUniswapV3Position';
+import { useOnChainBalances } from '@/hooks/useOnChainBalances';
+import { useDeFiPositions } from '@/hooks/useDeFiPositions';
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Card 1 — Smart Wallet Balance
+// Card 1 — Total Net Worth (wallet balances + DeFi positions)
 // ─────────────────────────────────────────────────────────────────────────────
 
 const NetWorthCard: React.FC = () => {
-  const { eoaAddress, smartAccountAddress } = useWallet();
-  const { targetChain } = useEnvironment();
-  const { ethPriceUsd } = usePriceData();
-  const uniswapData = useUniswapV3Position(4859024);
-
-  const { data: saBalance, isLoading: saLoading } = useBalance({
-    address: smartAccountAddress ?? undefined,
-    chainId: targetChain.id,
-    query: { enabled: !!smartAccountAddress },
-  });
-
-  const { data: eoaBalance, isLoading: eoaLoading } = useBalance({
-    address: eoaAddress ?? undefined,
-    chainId: targetChain.id,
-    query: { enabled: !!eoaAddress },
-  });
-
   const { isMockMode } = useEnvironment();
-  const saEth = saBalance ? parseFloat(formatEther(saBalance.value)) : 0;
-  const eoaEth = eoaBalance ? parseFloat(formatEther(eoaBalance.value)) : 0;
-  const totalEth = isMockMode ? 1.57 : (saEth + eoaEth);
-  const totalDeFiUsd = isMockMode ? 10000 : (uniswapData.totalValue || 0);
-  const totalNetWorthUsd = (totalEth * ethPriceUsd) + totalDeFiUsd;
+  const { assets, ethPrice, isLoading: balLoading } = useOnChainBalances();
+  const { positions, isLoading: posLoading } = useDeFiPositions();
 
-  const isLoading = !isMockMode && (saLoading || eoaLoading || uniswapData.isLoading);
+  const walletUsd = assets.reduce((sum, a) => sum + a.usdValue, 0);
+  const defiUsd = positions.reduce((sum, p) => sum + (p.valueUsd || 0), 0);
+  const totalNetWorthUsd = walletUsd + defiUsd;
+  const ethAsset = assets.find((a) => a.symbol === 'ETH' || a.symbol === 'WETH');
+  const totalEth = ethAsset?.balance ?? 0;
+  const price = ethPrice || ethAsset?.price || 0;
+
+  const isLoading = !isMockMode && (balLoading || posLoading);
 
   return (
     <div
@@ -86,7 +72,7 @@ const NetWorthCard: React.FC = () => {
         </div>
         <div className="flex items-center gap-1">
           <ArrowUpRight size={14} className="text-[#00FFA3]" />
-          <span className="text-xs font-medium text-[#00FFA3]">{isMockMode ? 'MOCKED' : 'Live'}</span>
+          <span className="text-xs font-medium text-[#00FFA3]">{isMockMode ? 'Showcase' : 'Live'}</span>
         </div>
       </div>
       <p className="text-xs text-gray-400 font-medium uppercase tracking-wider mb-1">
@@ -103,7 +89,10 @@ const NetWorthCard: React.FC = () => {
         </p>
       )}
       <p className="text-xs text-gray-500 mt-1">
-        {totalEth.toFixed(4)} ETH + DeFi Assets
+        Wallet ${walletUsd.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+        {defiUsd > 0 ? ` · DeFi $${defiUsd.toLocaleString(undefined, { maximumFractionDigits: 0 })}` : ''}
+        {totalEth > 0 ? ` · ${totalEth.toFixed(4)} ETH` : ''}
+        {price > 0 ? ` @ $${price.toLocaleString(undefined, { maximumFractionDigits: 0 })}` : ''}
       </p>
     </div>
   );
@@ -112,30 +101,16 @@ const NetWorthCard: React.FC = () => {
 // ... existing Change24hCard code ...
 
 const Change24hCard: React.FC = () => {
-  const { eoaAddress, smartAccountAddress } = useWallet();
   const { ethPriceUsd, eth24hChangePct: realChange, isLoading: priceLoading } = usePriceData();
-  const { targetChain, isMockMode } = useEnvironment();
-  const uniswapData = useUniswapV3Position(4859024);
+  const { isMockMode } = useEnvironment();
+  const { assets } = useOnChainBalances();
 
   const eth24hChangePct = isMockMode ? 2.45 : realChange;
+  const ethAsset = assets.find((a) => a.symbol === 'ETH' || a.symbol === 'WETH');
+  const totalEth = ethAsset?.balance ?? 0;
+  const price = ethPriceUsd || ethAsset?.price || 0;
 
-  const { data: saBalance } = useBalance({
-    address: smartAccountAddress ?? undefined,
-    chainId: targetChain.id,
-    query: { enabled: !!smartAccountAddress && !isMockMode },
-  });
-
-  const { data: eoaBalance } = useBalance({
-    address: eoaAddress ?? undefined,
-    chainId: targetChain.id,
-    query: { enabled: !!eoaAddress && !isMockMode },
-  });
-
-  const saEth = saBalance ? parseFloat(formatEther(saBalance.value)) : 0;
-  const eoaEth = eoaBalance ? parseFloat(formatEther(eoaBalance.value)) : 0;
-  const totalEth = isMockMode ? 1.57 : (saEth + eoaEth);
-  
-  const dollarChange = (totalEth * ethPriceUsd) * (eth24hChangePct / 100);
+  const dollarChange = totalEth * price * (eth24hChangePct / 100);
   const isPositive = eth24hChangePct >= 0;
 
   const pctDisplay = (priceLoading && !isMockMode)
@@ -197,7 +172,9 @@ const Change24hCard: React.FC = () => {
         </p>
       )}
       <p className="text-xs text-gray-500 mt-1">
-        ETH · $2,580.42
+        ETH · {price > 0
+          ? `$${price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+          : '—'}
       </p>
     </div>
   );
@@ -208,21 +185,23 @@ const Change24hCard: React.FC = () => {
 const DefiMetricCards: React.FC = () => {
   const { data: agentData, isLoading: agentLoading } = useAgentData();
   const { isMockMode } = useEnvironment();
+  const { positions, isLoading: posLoading } = useDeFiPositions();
 
-  // Active positions: securely decoupled from off-chain APIs mapped natively to UI state
-  const positionsCount = isMockMode ? 3 : 1;
-  const positionsLoading = !isMockMode && false;
+  const positionsCount = isMockMode
+    ? 3
+    : (positions.length || agentData?.positions_found || 0);
+  const positionsLoading = !isMockMode && posLoading;
 
-  // Best APY from agent opportunities
   const opportunities = agentData?.opportunities ?? [];
-  const bestApy = isMockMode 
-    ? "60.4%" 
-    : opportunities.length > 0
-      ? Math.max(...opportunities.map((o) => o.target_apy)).toFixed(1) + '%'
-      : null;
+  const bestApy = opportunities.length > 0
+    ? Math.max(...opportunities.map((o) => o.target_apy)).toFixed(1) + '%'
+    : (isMockMode ? '60.4%' : null);
 
-  // Position subtitle
-  let positionSubtitle = isMockMode ? 'Across 3 protocols' : 'native smart wallet layer';
+  const positionSubtitle = isMockMode
+    ? 'Across 3 protocols'
+    : positionsCount > 0
+      ? `On ${[...new Set(positions.map((p) => p.protocol))].length || 1} protocol(s)`
+      : 'No open positions';
 
   return (
     <>
@@ -254,7 +233,7 @@ const DefiMetricCards: React.FC = () => {
           <div className="flex items-center gap-1">
             <ArrowUpRight size={14} className="text-[#00FFA3]" />
             <span className="text-xs font-medium text-[#00FFA3]">
-              {isMockMode ? '3 vaults' : '1 chain'}
+              {isMockMode ? '3 vaults' : 'Base'}
             </span>
           </div>
         </div>
@@ -262,15 +241,24 @@ const DefiMetricCards: React.FC = () => {
           Active DeFi Positions
         </p>
         <p className="text-2xl font-bold text-white tracking-tight font-mono">
-          {positionsLoading ? '…' : positionsCount !== null ? `${positionsCount}` : '—'}
+          {positionsLoading ? '…' : `${positionsCount}`}
         </p>
+        <p className="text-xs text-gray-500 mt-1">{positionSubtitle}</p>
       </div>
 
       <BestApyCard
         value={bestApy}
         loading={!isMockMode && agentLoading}
-        opportunitiesCount={isMockMode ? 4 : opportunities.length}
-        subtitle={isMockMode ? 'Aggregated from 3 chains' : (agentLoading ? 'Fetching…' : bestApy ? 'from agent scan' : 'Enable agent to scan')}
+        opportunitiesCount={opportunities.length}
+        subtitle={
+          isMockMode
+            ? 'Showcase opportunities'
+            : agentLoading
+              ? 'Fetching…'
+              : bestApy
+                ? 'from agent scan'
+                : 'Connect & disable Showcase to scan'
+        }
       />
     </>
   );

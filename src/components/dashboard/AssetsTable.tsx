@@ -1,6 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { useTokenBalances, type LiveToken } from '@/hooks/useTokenBalances';
-import { useWallet } from '@/contexts/WalletContext';
+import { useOnChainBalances } from '@/hooks/useOnChainBalances';
 import {
   ArrowUpRight,
   ArrowDownRight,
@@ -43,12 +42,26 @@ type SortKey = 'name' | 'price' | 'balance' | 'usdValue';
 type SortDir = 'asc' | 'desc';
 
 const AssetsTable: React.FC = () => {
-  const { smartAccountAddress } = useWallet();
-  const { tokens, isLoading } = useTokenBalances(smartAccountAddress);
+  const { assets, isLoading } = useOnChainBalances();
+  const tokens = useMemo(
+    () =>
+      assets.map((a) => ({
+        id: a.id,
+        symbol: a.symbol,
+        name: a.name,
+        color: a.color,
+        balance: a.balance,
+        price: a.price,
+        usdValue: a.usdValue,
+        change24h: 0,
+        sparkline: [] as number[],
+      })),
+    [assets],
+  );
   const [searchQuery, setSearchQuery] = useState('');
   const [sortKey, setSortKey] = useState<SortKey>('usdValue');
   const [sortDir, setSortDir] = useState<SortDir>('desc');
-  const [favorites, setFavorites] = useState<Set<string>>(new Set(['eth']));
+  const [favorites, setFavorites] = useState<Set<string>>(new Set(['native-eth', 'eth']));
 
   const toggleFavorite = (id: string) => {
     setFavorites((prev) => {

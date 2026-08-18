@@ -94,7 +94,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeNav, onNavChange, collapsed, on
           </div>
           {!collapsed && (
             <span className="text-lg font-bold tracking-tight text-white whitespace-nowrap transition-colors duration-500">
-              Zenith<span style={{ color: accentColor }}>Fi</span>
+              Zeinyra
               {agentActive && (
                 <motion.span 
                   initial={{ opacity: 0, x: -5 }}

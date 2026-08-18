@@ -16,12 +16,9 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import { TrendingUp, TrendingDown, Maximize2, Loader2, AlertTriangle } from 'lucide-react';
-import { useBalance } from 'wagmi';
-import { formatEther } from 'viem';
-import { useWallet } from '@/contexts/WalletContext';
-import { useEnvironment } from '@/contexts/EnvironmentContext';
+import { useOnChainBalances } from '@/hooks/useOnChainBalances';
+import { useDeFiPositions } from '@/hooks/useDeFiPositions';
 import { usePortfolioHistory } from '@/hooks/usePortfolioHistory';
-import { useUniswapV3Position } from '@/hooks/useUniswapV3Position';
 import { usePriceData } from '@/hooks/usePriceData';
 
 type TimeRange = '24H' | '7D' | '30D' | '90D' | '1Y' | 'ALL';
@@ -62,35 +59,21 @@ const CustomTooltip: React.FC<TooltipProps> = ({ active, payload, label }) => {
 const PerformanceChart: React.FC = () => {
   const [activeRange, setActiveRange] = useState<TimeRange>('30D');
 
-  const { eoaAddress, smartAccountAddress } = useWallet();
-  const { targetChain } = useEnvironment();
   const { ethPriceUsd } = usePriceData();
-  const uniswapData = useUniswapV3Position(4859024);
+  const { assets, isLoading: balLoading } = useOnChainBalances();
+  const { positions, isLoading: posLoading } = useDeFiPositions();
 
-  const { data: saBalanceData, isLoading: saLoading } = useBalance({
-    address: smartAccountAddress ?? undefined,
-    chainId: targetChain.id,
-    query: { enabled: !!smartAccountAddress },
-  });
-
-  const { data: eoaBalanceData, isLoading: eoaLoading } = useBalance({
-    address: eoaAddress ?? undefined,
-    chainId: targetChain.id,
-    query: { enabled: !!eoaAddress },
-  });
-
-  const saEth = saBalanceData ? parseFloat(formatEther(saBalanceData.value)) : 0;
-  const eoaEth = eoaBalanceData ? parseFloat(formatEther(eoaBalanceData.value)) : 0;
-  const totalDeFiUsd = uniswapData.totalValue || 0;
-
-  // Aggregate Synthetic ETH Weight (treats multi-asset portfolio as ETH-priced history)
-  const syntheticEthFromDeFi = ethPriceUsd > 0 ? totalDeFiUsd / ethPriceUsd : 0;
-  const aggregateEthBalance = saEth + eoaEth + syntheticEthFromDeFi;
+  const ethAsset = assets.find((a) => a.symbol === 'ETH' || a.symbol === 'WETH');
+  const walletEth = ethAsset?.balance ?? 0;
+  const defiUsd = positions.reduce((sum, p) => sum + (p.valueUsd || 0), 0);
+  const price = ethPriceUsd || ethAsset?.price || 0;
+  const syntheticEthFromDeFi = price > 0 ? defiUsd / price : 0;
+  const aggregateEthBalance = walletEth + syntheticEthFromDeFi;
 
   const { data, isLoading: historyLoading, isError, changePercent, changeDollar } =
     usePortfolioHistory(aggregateEthBalance, activeRange);
 
-  const isLoading = saLoading || eoaLoading || uniswapData.isLoading || historyLoading;
+  const isLoading = balLoading || posLoading || historyLoading;
 
   const isPositive = (changePercent ?? 0) >= 0;
 

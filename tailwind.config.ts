@@ -112,6 +112,6 @@ export default {
   },
   plugins: [
     animate,
-    typography,
+    typography
   ],
 } satisfies Config;

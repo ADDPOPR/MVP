@@ -98,7 +98,7 @@ const AppLayout: React.FC = () => {
           >
             <h2 className="text-xl font-bold text-white mb-2">Wrong Network</h2>
             <p className="text-sm text-gray-400 leading-relaxed mb-6">
-              ZenithFi requires the Base Mainnet. Please switch your network to continue.
+              Zeinyra requires the Base Mainnet. Please switch your network to continue.
             </p>
             <button
               onClick={() => switchChain({ chainId: 8453 })}
@@ -128,8 +128,8 @@ const AppLayout: React.FC = () => {
             </div>
             <h2 className="text-xl font-bold text-white mb-2">Deploy Your Smart Wallet</h2>
             <p className="text-sm text-gray-400 leading-relaxed mb-6">
-              ZenithFi uses Account Abstraction (ERC-4337) to enable gasless AI-managed transactions.
-              Deploy your personal <span className="text-[#00D4FF] font-mono">ZenithFiAccount</span> to unlock the full dashboard.
+              Zeinyra uses Account Abstraction (ERC-4337) to enable gasless AI-managed transactions.
+              Deploy your personal <span className="text-[#00D4FF] font-mono">ZeinyraAccount</span> to unlock the full dashboard.
             </p>
             <div
               className="rounded-xl p-4 mb-6 text-left"
@@ -138,7 +138,7 @@ const AppLayout: React.FC = () => {
               <p className="text-xs text-[#00D4FF] font-semibold mb-1">Production Network</p>
               <p className="text-xs text-gray-400">
                 Connected to <span className="font-mono text-[#00D4FF]">Base Mainnet</span>. 
-                Deploy your personal <span className="font-mono text-[#00D4FF]">ZenithFiAccount</span> at:
+                Deploy your personal <span className="font-mono text-[#00D4FF]">ZeinyraAccount</span> at:
                 <span className="font-mono text-[#00D4FF] text-[10px] block mt-1 break-all">
                   {displayAddress ?? 'predicting…'}
                 </span>
@@ -194,7 +194,7 @@ const AppLayout: React.FC = () => {
                   {activeNav === 'defi' && 'Monitor and manage your decentralized finance positions.'}
                   {activeNav === 'yield' && 'Explore yield farming opportunities across DeFi protocols.'}
                   {activeNav === 'history' && 'Review all your on-chain transactions and activity.'}
-                  {activeNav === 'agent-chat' && 'Chat with your ZenithFi strategist about portfolio and yield.'}
+                  {activeNav === 'agent-chat' && 'Chat with your Zeinyra strategist about portfolio and yield.'}
                 </p>
               </div>
 
@@ -215,7 +215,7 @@ const AppLayout: React.FC = () => {
                     </svg>
                   </div>
                   <span className="text-xs text-gray-500">
-                    ZenithFi Dashboard v1.0.5 · Base Mainnet
+                    Zeinyra Dashboard v1.0.5 · Base Mainnet
                   </span>
                 </div>
                 <div className="flex items-center gap-4">

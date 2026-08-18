@@ -49,7 +49,7 @@ const LandingPage: React.FC = () => {
               </svg>
             </div>
             <span className="text-xl font-bold tracking-tight">
-              Zenith<span className="text-[#00D4FF]">Fi</span>
+              Zeinyra
             </span>
           </div>
         </div>

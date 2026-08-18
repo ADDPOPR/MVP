@@ -193,7 +193,7 @@ export const mockAgentStrategy = {
       is_recommended: true
     },
     {
-      protocol: 'ZenithFi Agent',
+      protocol: 'Zeinyra Agent',
       target_protocol: 'Auto-Compounder v1',
       current_protocol: 'Manual Harvesting',
       pair: 'Global Portfolio',

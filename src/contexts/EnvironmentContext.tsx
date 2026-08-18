@@ -19,12 +19,13 @@ export const EnvironmentProvider: React.FC<{ children: ReactNode }> = ({ childre
     const toggleEnvironment = () => {};
 
     const [isMockMode, setIsMockMode] = useState<boolean>(() => {
-        const saved = localStorage.getItem('zenithfi_mock_mode');
-        return saved ? saved === 'true' : true; // Default to true for showcase
+        const saved = localStorage.getItem('Zeinyra_mock_mode');
+        // Default OFF — dashboard shows real connected-wallet numbers
+        return saved ? saved === 'true' : false;
     });
 
     useEffect(() => {
-        localStorage.setItem('zenithfi_mock_mode', isMockMode.toString());
+        localStorage.setItem('Zeinyra_mock_mode', isMockMode.toString());
     }, [isMockMode]);
 
     const targetChain = environment === 'PRODUCTION' ? base : baseSepolia;

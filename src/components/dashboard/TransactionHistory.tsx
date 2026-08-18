@@ -6,7 +6,7 @@ import {
   Loader2,
   AlertTriangle,
 } from 'lucide-react';
-import { ZenithFi_ACCOUNT_ADDRESS } from '@/constants/contracts';
+import { Zeinyra_ACCOUNT_ADDRESS } from '@/constants/contracts';
 import { useEnvironment } from '@/contexts/EnvironmentContext';
 
 // Etherscan V2 API (Unified Endpoint for all chains)

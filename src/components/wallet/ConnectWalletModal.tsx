@@ -239,7 +239,7 @@ const ConnectWalletModal: React.FC = () => {
               >
                 <Shield size={14} className="text-[#00D4FF] flex-shrink-0" />
                 <p className="text-[11px] text-gray-400 leading-relaxed">
-                  ZenithFi never stores your private keys. Connections are secured end-to-end.
+                  Zeinyra never stores your private keys. Connections are secured end-to-end.
                 </p>
               </div>
 
